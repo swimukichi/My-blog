@@ -1,0 +1,1660 @@
+/* リセットと基本フォント */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 無機質で冷たい等幅フォントをベースに */
+    font-family: "Space Mono", "Courier New", Courier, monospace;
+}
+
+body {
+    background-color: #000000;
+    /* OLED Actua Display 最適化の漆黒 */
+    color: #a3aab0;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    cursor: none;
+    /* カスタムカーソル用 */
+}
+
+/* --- カスタムカーソルキャンバス --- */
+#biomech-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* --- スキャンノイズと心電図エフェクト --- */
+.scan-glitch-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9998;
+    background: repeating-linear-gradient(transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 3px,
+            rgba(0, 0, 0, 0.15) 3px);
+    opacity: 0.8;
+    mix-blend-mode: multiply;
+    animation: scanGlitch 4s infinite linear alternate, scanDistort 8s infinite step-end;
+    will-change: transform, opacity;
+}
+
+@keyframes scanGlitch {
+    0% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: translateY(-5px);
+        opacity: 0.9;
+    }
+}
+
+@keyframes scanDistort {
+
+    0%,
+    9%,
+    11%,
+    100% {
+        clip-path: inset(0 0 0 0);
+        transform: translateX(0);
+    }
+
+    10% {
+        clip-path: inset(20% 0 80% 0);
+        transform: translateX(-5px);
+    }
+
+    10.5% {
+        clip-path: inset(60% 0 10% 0);
+        transform: translateX(5px);
+    }
+}
+
+/* --- 微細なデジタルノイズ（Pixel 10 Actua向け） --- */
+.digital-noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    /* 背景の一番奥に配置 */
+    opacity: 0.03;
+    /* 極限まで低く、生命感のある揺らめき */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    animation: noiseShift 8s infinite steps(10);
+    will-change: background-position;
+}
+
+@keyframes noiseShift {
+
+    0%,
+    100% {
+        background-position: 0% 0%;
+    }
+
+    10% {
+        background-position: -5% -10%;
+    }
+
+    20% {
+        background-position: -15% 5%;
+    }
+
+    30% {
+        background-position: 7% -25%;
+    }
+
+    40% {
+        background-position: 20% 25%;
+    }
+
+    50% {
+        background-position: -25% 10%;
+    }
+
+    60% {
+        background-position: 15% 5%;
+    }
+
+    70% {
+        background-position: 0% 15%;
+    }
+
+    80% {
+        background-position: 25% 35%;
+    }
+
+    90% {
+        background-position: -10% 10%;
+    }
+}
+
+/* --- 高精細 SVG ECGライン（Pixel 10 最適化） --- */
+.biometric-ecg-svg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 60px;
+    /* SVGが画面幅に広がる高さ */
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.7;
+    filter: drop-shadow(0 0 5px rgba(168, 35, 35, 0.9));
+}
+
+.ecg-line {
+    fill: none;
+    stroke: #a82323;
+    /* 乾燥した血の色 */
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawVectorEcg 4s linear infinite;
+    will-change: stroke-dashoffset;
+}
+
+@keyframes drawVectorEcg {
+    0% {
+        stroke-dashoffset: 1000;
+        opacity: 0;
+    }
+
+    5% {
+        opacity: 1;
+    }
+
+    80% {
+        stroke-dashoffset: -1000;
+        opacity: 1;
+    }
+
+    100% {
+        stroke-dashoffset: -1000;
+        opacity: 0;
+    }
+}
+
+/* デフォルトのポインターも非表示にして世界観を徹底 */
+a,
+button,
+.gallery-item,
+.lang-switch,
+.bgm-toggle-container,
+.close-btn,
+input,
+textarea {
+    cursor: none !important;
+}
+
+/* 言語切り替えロジック */
+.lang-en {
+    display: none;
+}
+
+body.lang-en-active .lang-jp {
+    display: none;
+}
+
+body.lang-en-active .lang-en {
+    display: inline;
+}
+
+p .lang-en,
+p .lang-jp {
+    display: block;
+}
+
+body.lang-en-active p .lang-en {
+    display: block;
+}
+
+/* 言語切り替えスイッチ（神経レバー設定） */
+.lang-switch-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    background: rgba(10, 12, 14, 0.85);
+    border: 1px solid #2b1111;
+    border-radius: 20px;
+    padding: 5px 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(92, 24, 24, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.lang-nerve-node {
+    font-family: "Space Mono", monospace;
+    font-size: 0.8rem;
+    color: #5c1818;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.lang-nerve-node.active {
+    color: #c4a7a7;
+    text-shadow: 0 0 8px rgba(196, 167, 167, 0.6), 0 0 15px rgba(92, 24, 24, 0.4);
+    font-weight: bold;
+}
+
+.lang-switch-track {
+    width: 40px;
+    height: 12px;
+    background: #050608;
+    border: 1px solid #1a2026;
+    border-radius: 6px;
+    position: relative;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 1);
+    /* 血管のようなライン */
+    background-image: linear-gradient(90deg, transparent 45%, #2b1111 45%, #2b1111 55%, transparent 55%);
+}
+
+.lang-switch-thumb {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 30% 30%, #5c1818, #1a0505);
+    border: 1px solid #8a4b4b;
+    border-radius: 50%;
+    position: absolute;
+    top: -4px;
+    left: -2px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* 有機的なぬるっとした動き */
+    box-shadow: 0 0 5px rgba(92, 24, 24, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* 英語切り替え状態（右へスライド） */
+body.lang-en-active .lang-switch-thumb {
+    left: 22px;
+    background: radial-gradient(circle at 30% 30%, #8a4b4b, #2b1111);
+    border-color: #c4a7a7;
+}
+
+/* --- 不気味なアンビエントBGMトグル（脈動する肉の塊） --- */
+.bgm-toggle-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    background: rgba(10, 12, 14, 0.85);
+    border: 1px solid #2b1111;
+    border-radius: 30px;
+    padding: 5px 15px 5px 5px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(92, 24, 24, 0.2);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s;
+}
+
+.bgm-toggle-container:hover {
+    box-shadow: 0 0 20px rgba(92, 24, 24, 0.6), inset 0 0 15px rgba(92, 24, 24, 0.4);
+}
+
+.bgm-meat-core {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #4a1515, #1a0505);
+    border: 1px solid #7a3b3b;
+    box-shadow: 0 0 5px rgba(92, 24, 24, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.1);
+    /* 露出した端子のようなアクセント */
+    position: relative;
+    transition: all 0.5s;
+}
+
+/* 端子の中心部分 */
+.bgm-meat-core::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: #000;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 2px #c4a7a7;
+    transition: all 0.5s;
+}
+
+.bgm-label {
+    font-family: "Space Mono", monospace;
+    font-size: 0.8rem;
+    color: #5c1818;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    transition: color 0.3s;
+}
+
+/* BGM再生時の脈動アクション */
+.bgm-toggle-container.playing .bgm-meat-core {
+    background: radial-gradient(circle at 30% 30%, #a82323, #3a0a0a);
+    animation: heartBeatGrotesque 1.5s infinite ease-in-out;
+    box-shadow: 0 0 15px rgba(168, 35, 35, 0.6), inset 0 0 8px rgba(255, 100, 100, 0.3);
+    border-color: #d15c5c;
+}
+
+.bgm-toggle-container.playing .bgm-meat-core::after {
+    background: #ff3333;
+    box-shadow: 0 0 8px #ffcccc;
+}
+
+.bgm-toggle-container.playing .bgm-label {
+    color: #c4a7a7;
+    text-shadow: 0 0 8px rgba(196, 167, 167, 0.6);
+}
+
+@keyframes heartBeatGrotesque {
+    0% {
+        transform: scale(1) skew(0deg);
+    }
+
+    15% {
+        transform: scale(1.2) skew(2deg);
+        filter: brightness(1.2);
+    }
+
+    30% {
+        transform: scale(1) skew(0deg);
+    }
+
+    45% {
+        transform: scale(1.15) skew(-2deg);
+        filter: brightness(1.1);
+    }
+
+    100% {
+        transform: scale(1) skew(0deg);
+        filter: brightness(1);
+    }
+}
+
+/* 有機的な背景：呼吸するようにゆっくり明滅する金属と肉の融合 */
+.organic-background {
+    position: fixed;
+    top: -5%;
+    left: -5%;
+    width: 110vw;
+    height: 110vh;
+    /* ディストーションの余白確保 */
+    z-index: -1;
+    /* ぬめり気のある配線や筋肉を思わせるグラデーション（血の色を追加） */
+    background:
+        radial-gradient(circle at 30% 70%, rgba(60, 20, 20, 0.4) 0%, transparent 50%),
+        /* マルーンの血溜まり */
+        radial-gradient(circle at 70% 30%, rgba(20, 30, 40, 0.6) 0%, transparent 60%),
+        repeating-radial-gradient(circle at 50% 50%, transparent 0, rgba(10, 15, 20, 0.1) 10px, transparent 20px),
+        /* 完全なOLEDブラック */
+        #000000;
+    opacity: 0.85;
+    /* 不気味な呼吸のテンポと歪み */
+    animation: breatheGrotesque 15s infinite alternate ease-in-out;
+    mix-blend-mode: multiply;
+    /* パフォーマンス最適化 */
+    will-change: transform, filter;
+    transform: translateZ(0);
+}
+
+#bg-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    transform: translate(-50%, -50%) translateZ(0);
+    /* ハードウェアアクセラレーション */
+    object-fit: cover;
+    opacity: 0.15;
+    /* 視認できるギリギリの不気味さ */
+    filter: sepia(0.6) hue-rotate(330deg) contrast(1.5) blur(1px);
+    /* 血肉のようなくすんだ色調 */
+    mix-blend-mode: overlay;
+    /* 背景と不気味に溶け合う */
+    pointer-events: none;
+    will-change: opacity, filter;
+}
+
+@keyframes breatheGrotesque {
+    0% {
+        transform: scale(1) rotate(0deg);
+        filter: brightness(0.6) sepia(0.4) hue-rotate(340deg) contrast(1.2);
+        /* やや赤みを帯びる */
+    }
+
+    50% {
+        transform: scale(1.02) rotate(0.5deg);
+        filter: brightness(0.8) sepia(0.6) hue-rotate(350deg) contrast(1.4);
+    }
+
+    100% {
+        transform: scale(1.05) rotate(-0.5deg);
+        filter: brightness(0.5) sepia(0.5) hue-rotate(340deg) contrast(1.5);
+    }
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* 骨格化されたフォント */
+h1,
+h2,
+h3 {
+    font-family: "Eater", "Cinzel", cursive, serif;
+    /* Eaterを中心とした攻撃的で骨のようなフォント */
+    text-transform: uppercase;
+}
+
+/* テキスト系全般をShare Tech Monoでサイバーパンク・ホラー寄りに */
+p,
+a,
+span,
+label,
+input,
+textarea,
+button,
+li {
+    font-family: "Share Tech Mono", "Space Mono", monospace;
+}
+
+/* タイトル：錆びた金属と乾いた血の質感 */
+.title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: #4a5d6e;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9),
+        -1px -1px 1px rgba(100, 130, 150, 0.2),
+        0 0 15px rgba(139, 0, 0, 0.3);
+    /* 赤黒い発光 */
+    letter-spacing: clamp(1px, 2vw, 3px);
+    text-align: center;
+    /* 不安定な照明の明滅エフェクト */
+    animation: flickerLight 6s infinite;
+}
+
+/* 蛍光灯の点滅・生命維持装置の明滅 */
+@keyframes flickerLight {
+
+    0%,
+    18%,
+    22%,
+    25%,
+    53%,
+    57%,
+    100% {
+        opacity: 1;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9), 0 0 15px rgba(139, 0, 0, 0.3);
+    }
+
+    20%,
+    24%,
+    55% {
+        opacity: 0.4;
+        text-shadow: none;
+    }
+}
+
+.subtitle {
+    text-align: center;
+    color: #5c1818;
+    /* くすんだ暗いマルーン（血の色） */
+    margin-bottom: 4rem;
+    font-size: 1rem;
+    letter-spacing: 4px;
+    font-family: "Share Tech Mono", monospace;
+    text-shadow: 0 0 5px rgba(92, 24, 24, 0.5);
+}
+
+/* 脊椎（Spine）のようなメニュー */
+.spine-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-left: 4px double #2b1111;
+    /* 神経と血管の束のように */
+    padding-left: 20px;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+/* 各メニュー項目（脊椎の骨） */
+.vertebra {
+    position: relative;
+    text-decoration: none;
+    color: #6b7d8c;
+    font-size: 1.2rem;
+    padding: 10px 15px;
+    background: linear-gradient(90deg, #0d0f12, #050608);
+    border: 1px solid #1a2026;
+    border-radius: 2px 6px 6px 2px;
+    /* 骨の関節のような歪な形 */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    display: inline-block;
+    width: 250px;
+    flex-shrink: 0;
+}
+
+/* ホバー時に「乾いた血・肉の筋」が反応するエフェクト */
+.vertebra:hover {
+    color: #c4a7a7;
+    /* 血の気を帯びた色 */
+    border-color: #5c1818;
+    /* マルーン */
+    box-shadow: inset 5px 0 15px rgba(92, 24, 24, 0.6), 0 0 10px rgba(92, 24, 24, 0.3);
+    transform: translateX(15px);
+}
+
+@media (max-width: 600px) {
+    .vertebra:hover {
+        transform: translateY(-5px);
+    }
+}
+
+/* 血管を這うようなアニメーション */
+.flesh-glow {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(92, 24, 24, 0.4), transparent);
+    transition: all 0.6s ease-in-out;
+    z-index: 1;
+}
+
+.vertebra:hover .flesh-glow {
+    left: 100%;
+}
+
+/* コンテンツ部分 - より暗く、有機的な境界線 */
+.content-box {
+    background: linear-gradient(to bottom right, rgba(10, 12, 14, 0.95), rgba(5, 6, 7, 0.98));
+    border: 1px solid #12181d;
+    border-top: 2px solid #2b1111;
+    /* マルーンの滴るようなライン */
+    padding: 2.5rem;
+    border-radius: 4px;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 15px 40px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    margin-bottom: 2.5rem;
+}
+
+.content-box h2 {
+    color: #6b7d8c;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dashed #2b1111;
+    /* 血の滲んだ破線 */
+    padding-bottom: 0.5rem;
+    letter-spacing: 3px;
+    font-size: 1.8rem;
+    text-shadow: 0 0 8px rgba(92, 24, 24, 0.2);
+}
+
+/* --- ABOUT Section --- */
+.about-content p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    color: #8c9ba8;
+}
+
+.business-list {
+    list-style: none;
+    margin-top: 1.5rem;
+    padding-left: 10px;
+    border-left: 2px solid #3e4f5c;
+}
+
+.business-list li {
+    margin-bottom: 1rem;
+    padding-left: 15px;
+    position: relative;
+    line-height: 1.6;
+}
+
+.business-list li::before {
+    content: '▶';
+    position: absolute;
+    left: -10px;
+    top: 2px;
+    color: #5c1818;
+    /* マルーン */
+    font-size: 0.8rem;
+    background: transparent;
+    padding: 2px 0;
+    text-shadow: 0 0 5px rgba(92, 24, 24, 0.8);
+}
+
+.business-list strong {
+    color: #c4a7a7;
+    /* 骨や乾いた肉のような色 */
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 0.3rem;
+}
+
+/* --- CONTACT Form --- */
+.contact-form {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #7b8e99;
+    letter-spacing: 1px;
+    font-family: monospace;
+}
+
+.form-group input,
+.form-group textarea {
+    background: rgba(5, 6, 8, 0.8);
+    border: 1px solid #1a2026;
+    border-bottom: 2px solid #2b1111;
+    /* 赤黒い下線 */
+    border-radius: 2px;
+    padding: 12px;
+    color: #c4a7a7;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #5c1818;
+    box-shadow: 0 0 15px rgba(92, 24, 24, 0.4);
+    background: rgba(10, 12, 14, 0.9);
+}
+
+.submit-btn {
+    background: linear-gradient(90deg, #110505, #080202);
+    /* 血の気を感じる漆黒 */
+    border: 1px solid #2b1111;
+    color: #7b4a4a;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-family: "Eater", cursive;
+    /* ボタンも凶悪に */
+    letter-spacing: 3px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.4s ease;
+    margin-top: 1rem;
+    align-self: flex-start;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+}
+
+.submit-btn:hover {
+    color: #c4a7a7;
+    border-color: #5c1818;
+    box-shadow: 0 0 20px rgba(92, 24, 24, 0.6) inset, 0 0 10px rgba(92, 24, 24, 0.4);
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* --- Note Link Card (Wet Organic Metal) --- */
+.note-card-container {
+    margin-top: 3rem;
+}
+
+.section-subheading {
+    color: #4a6b5d;
+    font-family: "Space Mono", monospace;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dashed #2a3540;
+    padding-bottom: 0.5rem;
+}
+
+.rss-feed-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
+}
+
+.note-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    /* 生体組織が融合した記録媒体・雑誌の表紙のような質感 */
+    background: linear-gradient(135deg, #11151a 0%, #0d1217 50%, #080b0f 100%);
+    border: 1px solid #1f2a36;
+    border-left: 6px solid #283830;
+    /* 背表紙やデータ端子のような太いボーダー */
+    border-radius: 2px 8px 8px 2px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: inset -5px 0 15px rgba(0, 0, 0, 0.6), 0 8px 15px rgba(0, 0, 0, 0.6);
+    height: 100%;
+}
+
+/* 記録媒体・変異したペーパーのような質感（汚れや血管） */
+.note-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(74, 107, 93, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, rgba(50, 60, 70, 0.1) 0%, transparent 50%);
+    opacity: 0.8;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+.note-card:hover {
+    border-color: #4a6b5d;
+    border-left-color: #6ea88f;
+    /* 接続端子が発光するイメージ */
+    box-shadow: inset -5px 0 20px rgba(74, 107, 93, 0.1), 0 12px 25px rgba(10, 15, 20, 0.9), 0 0 20px rgba(74, 107, 93, 0.2);
+    transform: translateY(-5px) scale(1.02);
+}
+
+.note-card:hover::after {
+    opacity: 1;
+    /* 吸収された光沢が浮かび上がる */
+    background: radial-gradient(circle at 80% 20%, rgba(136, 207, 174, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(100, 150, 180, 0.1) 0%, transparent 60%);
+}
+
+/* 生体パーツが這う様子（神経シナプスやスキャンライン） */
+.note-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 15px;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(74, 107, 93, 0.3), transparent);
+    transition: all 0.4s ease;
+    /* シグナルや神経の断続的なライン */
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 4px, rgba(40, 74, 61, 0.5) 4px, rgba(40, 74, 61, 0.5) 8px);
+}
+
+.note-card:hover::before {
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 4px, rgba(110, 168, 143, 0.8) 4px, rgba(110, 168, 143, 0.8) 8px);
+    box-shadow: 0 0 8px #6ea88f;
+}
+
+.note-badge {
+    font-size: 0.65rem;
+    font-family: "Space Mono", monospace;
+    background: #0f0505;
+    /* 赤黒いバッジ */
+    color: #8a4b4b;
+    /* 乾いた血の色 */
+    padding: 4px 12px;
+    border-radius: 0;
+    display: inline-block;
+    margin-bottom: 1.2rem;
+    letter-spacing: 2px;
+    border: 1px solid #2b1111;
+    border-left: 3px solid #5c1818;
+    align-self: flex-start;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.8);
+    position: relative;
+    z-index: 1;
+}
+
+/* --- ABOUT (MUTATION LOG) 変異の記録 --- */
+.mutation-log {
+    position: relative;
+    overflow: hidden;
+    padding: 3rem;
+    border: 1px solid #2b1111;
+    background: linear-gradient(135deg, rgba(5, 5, 5, 0.9), rgba(15, 5, 5, 0.95));
+}
+
+/* ABOUTページのみ、ホバー時にグリッチエフェクトを強める（機密データの閲覧感） */
+body:has(.mutation-log:hover) .scan-glitch-overlay {
+    animation: scanGlitch 2s infinite linear alternate, scanDistortIntense 3s infinite step-end;
+    background: repeating-linear-gradient(transparent,
+            transparent 2px,
+            rgba(30, 0, 0, 0.2) 3px,
+            rgba(30, 0, 0, 0.2) 3px);
+}
+
+@keyframes scanDistortIntense {
+
+    0%,
+    9%,
+    11%,
+    49%,
+    51%,
+    100% {
+        clip-path: inset(0 0 0 0);
+        transform: translateX(0);
+    }
+
+    10% {
+        clip-path: inset(15% 0 75% 0);
+        transform: translateX(-10px);
+    }
+
+    10.5% {
+        clip-path: inset(50% 0 30% 0);
+        transform: translateX(10px);
+    }
+
+    50% {
+        clip-path: inset(80% 0 10% 0);
+        transform: translateX(-5px);
+    }
+}
+
+.log-bg-texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(92, 24, 24, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(168, 35, 35, 0.03) 0%, transparent 50%);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* スキャンラインエフェクト（背景） */
+.log-bg-texture::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(168, 35, 35, 0.2);
+    box-shadow: 0 0 10px rgba(168, 35, 35, 0.5);
+    animation: bgScanline 8s linear infinite;
+}
+
+@keyframes bgScanline {
+    0% {
+        top: -10%;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 110%;
+        opacity: 0;
+    }
+}
+
+.log-entries {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.log-entry {
+    border-left: 2px solid #5c1818;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.log-entry::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    background: #000;
+    border: 1px solid #a82323;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(168, 35, 35, 0.8);
+}
+
+.log-header {
+    font-family: "Share Tech Mono", monospace;
+    font-size: 1.1rem;
+    color: #c4a7a7;
+    margin-bottom: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px dashed #3a1a1a;
+    padding-bottom: 0.3rem;
+    display: inline-block;
+}
+
+/* 警告セクション（赤く明滅・強調） */
+.alert-log {
+    border-left-color: #ff3333;
+    animation: alertPulse 2s infinite alternate;
+}
+
+.alert-log::before {
+    border-color: #ff3333;
+    box-shadow: 0 0 10px rgba(255, 50, 50, 0.9);
+    background: #5c1818;
+}
+
+.alert-log .log-header {
+    color: #ff5555;
+    border-bottom-color: #ff3333;
+    text-shadow: 0 0 8px rgba(255, 50, 50, 0.6);
+}
+
+@keyframes alertPulse {
+    from {
+        background-color: transparent;
+    }
+
+    to {
+        background-color: rgba(92, 24, 24, 0.1);
+    }
+}
+
+/* 英語切り替え時はより無機質に */
+body.lang-en-active .log-header {
+    color: #8899aa;
+    border-bottom-color: #2a3a4a;
+}
+
+body.lang-en-active .log-entry::before {
+    border-color: #557799;
+    box-shadow: 0 0 5px rgba(85, 119, 153, 0.8);
+}
+
+body.lang-en-active .mutation-log {
+    border-color: #1a2530;
+    background: linear-gradient(135deg, rgba(5, 6, 7, 0.95), rgba(10, 12, 15, 0.95));
+}
+
+/* タイピングエフェクト用 */
+.typing-text {
+    font-family: inherit;
+    line-height: 1.6;
+    color: #a3aab0;
+    margin: 0;
+    display: inline;
+}
+
+.cursor-blink {
+    display: inline-block;
+    width: 8px;
+    height: 1.2em;
+    background-color: #a82323;
+    vertical-align: text-bottom;
+    margin-left: 4px;
+    animation: textBlink 1s step-end infinite;
+}
+
+body.lang-en-active .cursor-blink {
+    background-color: #557799;
+    /* 英語時は冷たい色 */
+}
+
+@keyframes textBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* 生体認証風UI */
+.biometric-scan-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px dotted #3a1a1a;
+    background: rgba(10, 5, 5, 0.6);
+    position: relative;
+    cursor: none;
+    transition: all 0.3s ease;
+}
+
+.scan-btn {
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.9rem;
+    color: #8a4b4b;
+    display: block;
+    text-align: center;
+    transition: color 0.3s;
+}
+
+.scan-reveal-data {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s cubic-bezier(0, 1, 0, 1), opacity 0.4s ease;
+    margin-top: 0;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.85rem;
+    color: #c4a7a7;
+    position: relative;
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #a82323;
+    box-shadow: 0 0 8px #ff5555;
+    opacity: 0;
+    z-index: 2;
+}
+
+.biometric-scan-container:hover {
+    border-color: #a82323;
+    background: rgba(20, 5, 5, 0.8);
+    box-shadow: inset 0 0 15px rgba(168, 35, 35, 0.2);
+}
+
+.biometric-scan-container:hover .scan-btn {
+    color: #ff5555;
+    text-shadow: 0 0 8px rgba(255, 85, 85, 0.6);
+    text-decoration: line-through;
+    opacity: 0.3;
+}
+
+.biometric-scan-container:hover .scan-reveal-data {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 1rem;
+    transition: max-height 1s ease-in-out, opacity 0.8s ease 0.2s;
+}
+
+.biometric-scan-container:hover .scan-line {
+    opacity: 1;
+    animation: bioScanPass 1.5s ease-in-out infinite;
+}
+
+@keyframes bioScanPass {
+    0% {
+        top: 0%;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+.note-card h3 {
+    color: #c4a7a7;
+    /* 骨色 */
+    font-size: 1.15rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    font-family: "Eater", serif;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.9), 0 0 10px rgba(92, 24, 24, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.note-card p {
+    color: #7b6a6a;
+    /* 濁った色 */
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.read-more {
+    color: #5c1818;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.note-card:hover .read-more {
+    color: #8a4b4b;
+    text-shadow: 0 0 8px rgba(138, 75, 75, 0.6);
+}
+
+/* --- Gallery Grid --- */
+.biomech-gallery {
+    display: grid;
+    /* 画面幅に合わせてカラム数を自動調整 (レスポンシブで美しく並べる) */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+    margin-top: 1rem;
+}
+
+.gallery-item {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid #1f272e;
+    cursor: pointer;
+    position: relative;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.gallery-item img,
+.gallery-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.6s ease;
+    filter: grayscale(80%) sepia(20%);
+    will-change: transform, filter;
+}
+
+/* ホバー時に生気を取り戻し、痙攣・浸食されるエフェクト */
+.gallery-item:hover {
+    border-color: #5c1818;
+    z-index: 10;
+}
+
+.gallery-item:hover img,
+.gallery-item:hover video {
+    transform: scale(1.15);
+    filter: grayscale(0%) sepia(20%) contrast(1.3) url('#organic-twitch');
+}
+
+/* 侵食される枠線（血管・機械パーツが内側へ迫る） */
+.gallery-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    transition: box-shadow 0.4s ease;
+}
+
+.gallery-item:hover::after {
+    box-shadow:
+        inset 0 0 30px rgba(92, 24, 24, 0.9),
+        inset 0 0 10px rgba(200, 50, 50, 0.5),
+        inset 0 0 50px rgba(0, 0, 0, 0.9);
+    animation: excitedHeartbeat 0.3s infinite alternate;
+}
+
+/* 興奮した心音と連動した点滅 */
+@keyframes excitedHeartbeat {
+    from {
+        box-shadow: inset 0 0 20px rgba(92, 24, 24, 0.8), inset 0 0 40px rgba(0, 0, 0, 0.9);
+    }
+
+    to {
+        box-shadow: inset 0 0 40px rgba(168, 35, 35, 0.9), inset 0 0 60px rgba(0, 0, 0, 0.9);
+        border: 2px solid #a82323;
+    }
+}
+
+/* レスポンシブ対応（スマホやタブレット向け） */
+@media (max-width: 768px) {
+    .container {
+        padding: 2rem 1rem;
+    }
+
+    /* メニューを水平方向にスクロールできるように変更（蛇腹のようなイメージ） */
+    .spine-menu {
+        flex-direction: row;
+        border-left: none;
+        border-bottom: 3px solid #1c2329;
+        padding-left: 0;
+        padding-bottom: 20px;
+        overflow-x: auto;
+        /* スクロールバーを見えなくする */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        scroll-snap-type: x mandatory;
+    }
+
+    .spine-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .vertebra {
+        width: 160px;
+        /* スマホ向けに少しコンパクトに */
+        font-size: 1rem;
+        text-align: center;
+        scroll-snap-align: start;
+    }
+
+    /* ギャラリーは最小幅を下げて縦に並びやすくする */
+    .biomech-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .biomech-gallery {
+        /* スマホ画面で狭すぎる場合は2列に固定 */
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .content-box {
+        padding: 1.5rem;
+    }
+
+    .close-btn {
+        top: 10px;
+        right: 20px;
+        font-size: 32px;
+    }
+}
+
+/* --- Lightbox Modal --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* 血だまりのような深い闇 */
+    background-color: rgba(5, 2, 2, 0.98);
+    backdrop-filter: blur(20px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-media-container {
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+    border: 2px solid #2b1111;
+    /* 太く赤みのある境界 */
+    border-radius: 4px;
+    /* 脈打つような赤い発光 */
+    box-shadow: 0 0 50px rgba(10, 0, 0, 1), 0 0 30px rgba(92, 24, 24, 0.4);
+    animation: zoomInFlesh 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+@keyframes zoomInFlesh {
+    0% {
+        transform: scale(0.9) skew(2deg, 2deg) translateZ(0);
+        opacity: 0;
+        filter: blur(5px);
+    }
+
+    50% {
+        transform: scale(1.02) skew(-1deg, -1deg) translateZ(0);
+        filter: blur(2px);
+    }
+
+    100% {
+        transform: scale(1) skew(0, 0) translateZ(0);
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: #5c1818;
+    /* マルーン */
+    font-size: 50px;
+    font-family: monospace;
+    /* 無機質で冷たい✖ */
+    cursor: pointer;
+    transition: all 0.3s;
+    text-shadow: 0 0 10px rgba(92, 24, 24, 0.8);
+}
+
+.close-btn:hover {
+    color: #c4a7a7;
+    transform: rotate(90deg) scale(1.2);
+    /* 威嚇するように回転して拡大 */
+    text-shadow: 0 0 15px rgba(196, 167, 167, 0.8);
+}
+
+/* --- Footer Credits --- */
+.site-footer {
+    width: 100%;
+    padding: 2rem 0 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.credit-text {
+    font-size: 0.6rem;
+    color: #3b2020;
+    /* 闇に沈み込むような極めて暗い赤黒色 */
+    letter-spacing: 2px;
+    font-family: "Share Tech Mono", monospace;
+    opacity: 0.4;
+    transition: opacity 0.5s, color 0.5s;
+    user-select: none;
+}
+
+.credit-text:hover {
+    opacity: 0.8;
+    color: #8a4b4b;
+    /* 見つけた時に少しだけ血の気が戻る */
+    text-shadow: 0 0 5px rgba(92, 24, 24, 0.5);
+}
+
+/* --- BIO-MECHANICAL SCROLL TO TOP --- */
+#biomech-scroll-top {
+    position: fixed;
+    bottom: -150px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 9900;
+    transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    pointer-events: auto;
+}
+
+#biomech-scroll-top.visible {
+    bottom: 30px;
+}
+
+.spine-cable {
+    width: 4px;
+    height: 70px;
+    background: repeating-linear-gradient(to bottom,
+            #a82323,
+            #a82323 6px,
+            #2b1111 6px,
+            #2b1111 12px);
+    box-shadow: 0 0 5px rgba(168, 35, 35, 0.6);
+    /* 脊椎のように伸び縮みするアニメーション */
+    animation: spineContract 3s infinite alternate ease-in-out;
+    transform-origin: bottom center;
+    transition: all 0.3s ease;
+}
+
+@keyframes spineContract {
+    0% {
+        transform: scaleY(1);
+        opacity: 0.8;
+        box-shadow: 0 0 5px rgba(168, 35, 35, 0.4);
+    }
+
+    100% {
+        transform: scaleY(0.7);
+        opacity: 1;
+        box-shadow: 0 0 12px rgba(255, 50, 50, 0.8);
+    }
+}
+
+.scroll-core {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: -5px;
+    /* 脊椎にめり込む感じ */
+    background: radial-gradient(circle at 30% 30%, #5c1818, #1a0505);
+    border: 2px solid #a82323;
+    box-shadow: 0 0 15px rgba(168, 35, 35, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #c4a7a7;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 0.85rem;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    animation: corePulseLight 2s infinite alternate;
+}
+
+@keyframes corePulseLight {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(168, 35, 35, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    100% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 50, 50, 0.8), inset 0 0 5px rgba(0, 0, 0, 0.5);
+        border-color: #ff5555;
+    }
+}
+
+/* ホバー時の「発熱・吸い上げ準備」状態 */
+#biomech-scroll-top:hover .scroll-core {
+    background: radial-gradient(circle at 30% 30%, #a82323, #3a0a0a);
+    color: #fff;
+    text-shadow: 0 0 8px #fff;
+    transform: scale(1.2);
+    box-shadow: 0 0 30px rgba(255, 85, 85, 0.9);
+    animation: none;
+    border-color: #ff8888;
+}
+
+#biomech-scroll-top:hover .spine-cable {
+    animation: none;
+    transform: scaleY(1.3);
+    background: #ff5555;
+    box-shadow: 0 0 15px #ff5555;
+    opacity: 1;
+}
+
+/* 英語設定時（冷徹な青系） */
+body.lang-en-active #biomech-scroll-top .spine-cable {
+    background: repeating-linear-gradient(to bottom,
+            #557799,
+            #557799 6px,
+            #1a2530 6px,
+            #1a2530 12px);
+    box-shadow: 0 0 5px rgba(85, 119, 153, 0.6);
+}
+
+body.lang-en-active #biomech-scroll-top .scroll-core {
+    background: radial-gradient(circle at 30% 30%, #2a3a4a, #0a0f15);
+    border-color: #557799;
+    color: #8899aa;
+    box-shadow: 0 0 15px rgba(85, 119, 153, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    animation: corePulseCold 2.5s infinite alternate;
+}
+
+@keyframes corePulseCold {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(85, 119, 153, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    100% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(136, 170, 204, 0.8), inset 0 0 5px rgba(0, 0, 0, 0.5);
+        border-color: #88aacc;
+    }
+}
+
+body.lang-en-active #biomech-scroll-top:hover .scroll-core {
+    background: radial-gradient(circle at 30% 30%, #557799, #1a2530);
+    color: #fff;
+    text-shadow: 0 0 8px #fff;
+    border-color: #aaccff;
+    box-shadow: 0 0 30px rgba(136, 170, 204, 0.9);
+}
+
+body.lang-en-active #biomech-scroll-top:hover .spine-cable {
+    background: #88aacc;
+    box-shadow: 0 0 15px #88aacc;
+}
+
+/* --- SPA TRANSITION (VISCOUS LIQUID / NERVE WEB) --- */
+#transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000;
+    background: transparent;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#transition-overlay.hidden {
+    display: none;
+}
+
+.transition-goo-balls {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    filter: url(#gooey-transition);
+}
+
+.goo-drop {
+    position: absolute;
+    background: #020202;
+    /* 真っ黒な粘液 */
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 1.2s cubic-bezier(0.8, 0, 0.2, 1);
+}
+
+.top-drop {
+    top: -20%;
+    left: 10%;
+    width: 80vw;
+    height: 80vw;
+}
+
+.bottom-drop {
+    bottom: -20%;
+    right: 10%;
+    width: 90vw;
+    height: 90vw;
+}
+
+.center-drop {
+    top: 50%;
+    left: 50%;
+    width: 150vw;
+    height: 150vw;
+    margin-top: -75vw;
+    margin-left: -75vw;
+}
+
+/* オーバーレイ発動時の増殖エフェクト */
+#transition-overlay.active .goo-drop {
+    transform: scale(1.5);
+}
+
+/* SPA時の表示制御 */
+body.spa-mode .content-box {
+    display: none;
+    opacity: 0;
+}
+
+body.spa-mode .content-box.active-section {
+    display: block;
+    animation: viscousFadeIn 1.5s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes viscousFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        filter: blur(15px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* SPA遷移時のグリッチ強化連動 */
+body.transition-glitch-active .scan-glitch-overlay {
+    animation: scanGlitch 0.2s infinite linear alternate, scanDistortIntense 0.3s infinite step-end;
+    background: repeating-linear-gradient(transparent,
+            rgba(255, 0, 0, 0.1) 2px,
+            rgba(50, 0, 0, 0.8) 4px,
+            rgba(10, 0, 0, 0.9) 6px);
+    mix-blend-mode: difference;
+    opacity: 1;
+}
