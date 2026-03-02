@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domestic Mutation - Portfolio</title>
+    <!-- Google Fonts for mechanical engraving and biological horror look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Eater&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- SVGフィルター：生物的な歪みエフェクト用 -->
+    <svg width="0" height="0" style="position:absolute;z-index:-1;">
+        <defs>
+            <filter id="organic-twitch">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise"
+                    id="turbulence-anim">
+                    <animate attributeName="baseFrequency" values="0.05;0.1;0.05" dur="0.2s" repeatCount="1"
+                        begin="indefinite" class="twitch-anim" />
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"
+                    id="displace-anim">
+                    <animate attributeName="scale" values="5;20;5" dur="0.2s" repeatCount="1" begin="indefinite"
+                        class="twitch-scale" />
+                </feDisplacementMap>
+            </filter>
+        </defs>
+    </svg>
+
+<body>
+    <!-- SPA遷移用オーバーレイレイヤー -->
+    <div id="transition-overlay" class="hidden">
+        <!-- SVGフィルターで粘り気のある動き（液体のような融合）を作成 -->
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
+            <defs>
+                <filter id="gooey-transition">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="
+                        1 0 0 0 0  
+                        0 1 0 0 0  
+                        0 0 1 0 0  
+                        0 0 0 40 -20" result="goo" />
+                    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                </filter>
+            </defs>
+        </svg>
+        <div class="transition-goo-balls">
+            <div class="goo-drop top-drop"></div>
+            <div class="goo-drop bottom-drop"></div>
+            <div class="goo-drop center-drop"></div>
+        </div>
+    </div>
+
+    <!-- カスタムバイオメカニカル・カーソル用キャンバス -->
+    <canvas id="biomech-cursor"></canvas>
+
+    <!-- スキャンノイズ、心電図エフェクト（SVG）、微細なデジタルノイズ（Pixel 10 OLED最適化） -->
+    <div class="digital-noise"></div>
+    <div class="scan-glitch-overlay"></div>
+
+    <svg class="biometric-ecg-svg" viewBox="0 0 1000 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 高精細(422ppi考慮)なベクター波形 -->
+        <path class="ecg-line"
+            d="M 0 50 L 300 50 L 320 20 L 340 80 L 360 50 L 700 50 L 720 30 L 740 70 L 760 10 L 780 90 L 800 50 L 1000 50" />
+    </svg>
+
+    <!-- 脈動するバイオメカニカル・アンビエントBGMスイッチ -->
+    <div class="bgm-toggle-container" id="bgm-toggle">
+        <div class="bgm-meat-core"></div>
+        <span class="bgm-label">
+            <span class="lang-jp" id="bgm-jp-text">生体音: 停止</span>
+            <span class="lang-en" id="bgm-en-text">AMBIENT: OFF</span>
+        </span>
+    </div>
+
+    <!-- 言語切り替えスイッチ（神経接続レバー） -->
+    <div class="lang-switch-container">
+        <div class="lang-switch" id="lang-switch">
+            <span class="lang-nerve-node active" id="lang-jp-lbl">JP</span>
+            <div class="lang-switch-track">
+                <div class="lang-switch-thumb" id="lang-thumb"></div>
+            </div>
+            <span class="lang-nerve-node" id="lang-en-lbl">EN</span>
+        </div>
+    </div>
+
+    <!-- 有機的な鼓動を打つ背景レイヤー -->
+    <div class="organic-background">
+        <video id="bg-video" autoplay loop muted playsinline>
+            <source src="images/hf_20260124_145655_76ecc6f8-8618-4927-9467-37ec38b0048c.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- メインのコンテナ -->
+    <div class="container">
+        <header>
+            <h1 class="title">DOMESTIC MUTATION</h1>
+            <p class="subtitle"> biomechanical portfolio </p>
+        </header>
+
+        <!-- 機械的な骨格・パイプを模したメニュー -->
+        <nav class="spine-menu">
+            <a href="#home" class="vertebra">HOME <span class="flesh-glow"></span></a>
+            <a href="#works" class="vertebra">WORKS <span class="flesh-glow"></span></a>
+            <a href="#about" class="vertebra">ABOUT <span class="flesh-glow"></span></a>
+            <a href="#contact" class="vertebra">CONTACT <span class="flesh-glow"></span></a>
+        </nav>
+
+        <main>
+            <!-- HOME Section -->
+            <section id="home" class="content-box">
+                <h2>
+                    <span class="lang-jp">日常の変異体</span>
+                    <span class="lang-en">DAILY MUTATIONS</span>
+                </h2>
+                <p>
+                    <span
+                        class="lang-jp">あらゆる日常の断片が、湿った組織と冷徹な機械に侵食され、異形の生命へと変貌を遂げる。<br>ここは、無機物と生体が境界を失い、再構築される『生活の変異体』の実験場です。</span>
+                    <span class="lang-en">Where everyday fragments are consumed by wet tissues and cold machinery,
+                        evolving into aberrant lifeforms.<br>This is the 'Domestic Mutation' laboratory, where the
+                        inorganic and the biological converge and are reconstructed.</span>
+                </p>
+
+                <!-- Dynamic Note Links from RSS -->
+                <div class="note-card-container">
+                    <h3 class="section-subheading">LATEST TRANSMISSIONS</h3>
+                    <div id="rss-feed-container" class="rss-feed-container">
+                        <!-- RSS feeds will be injected here via JavaScript -->
+                        <div class="note-card skeleton" style="opacity: 0.5;">
+                            <div class="note-badge">SENSING...</div>
+                            <h3>📡 受信中...</h3>
+                            <p>シグナルを解析しています...<br>Please wait for the transmission to complete.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WORKS Section -->
+            <section id="works" class="content-box">
+                <h2>
+                    <span class="lang-jp">生体機械ギャラリー</span>
+                    <span class="lang-en">BIOMECHANICAL GALLERY</span>
+                </h2>
+
+                <!-- Dynamic Image Gallery -->
+                <div class="biomech-gallery" id="biomech-gallery">
+                    <!-- Images will be dynamically loaded here by script.js -->
+                </div>
+            </section>
+
+            <!-- ABOUT Section (Mutation Log) -->
+            <section id="about" class="content-box mutation-log">
+                <h2>
+                    <span class="lang-jp">ABOUT：個体識別記録 (LOG-0801)</span>
+                    <span class="lang-en">ABOUT: ENTITY RECORD (LOG-0801)</span>
+                </h2>
+                <!-- 背景テクスチャ用要素 -->
+                <div class="log-bg-texture"></div>
+
+                <div class="about-content log-entries">
+
+                    <!-- 1. 観測対象 -->
+                    <article class="log-entry">
+                        <h3 class="log-header">
+                            <span class="lang-jp">1. 観測対象：NAO</span>
+                            <span class="lang-en">1. Subject: NAO</span>
+                        </h3>
+                        <p class="typing-text"
+                            data-jp="識別番号: #0801<br><br>潜伏期間: 34年。長きにわたる沈黙を経て、2026年、日常を侵食する「変異体」の核として覚醒。<br><br>座標: 東京・深層デジタル空間。<br><br>専門領域: 有機組織と機械部品の「禁忌の融合」。既存の造形を解体し、湿った質感と冷徹な回路が脈動するバイオメカニカルな生命体として再構成する。"
+                            data-en="ID Number: #0801<br><br>Incubation: 34 years. Following a prolonged silence, awakened in 2026 as the nucleus of a 'Mutation' eroding the mundane.<br><br>Coordinates: Tokyo - Deep Digital Space.<br><br>Expertise: The 'forbidden fusion' of organic tissue and mechanical components. Dismantling existing forms and reconstructing them into biomechanical lifeforms pulsing with wet textures and cold circuitry.">
+                        </p>
+                        <span class="cursor-blink">_</span>
+
+                        <!-- 生体認証スキャン用UI -->
+                        <div class="biometric-scan-container">
+                            <span class="scan-btn">
+                                <span class="lang-jp">[ 指紋認証を要求 (HOVER) ]</span>
+                                <span class="lang-en">[ REQUIRE BIOMETRIC SCAN (HOVER) ]</span>
+                            </span>
+                            <div class="scan-reveal-data">
+                                <div class="scan-line"></div>
+                                <span class="lang-jp">>> 解析完了：対象の構成物質の99.9%が未知の生体機械構造であることを確認。非常に高い侵食性あり。</span>
+                                <span class="lang-en">>> Analysis Complete: Confirmed 99.9% of subject's composition is
+                                    unknown biomechanical structure. Highly erosive.</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- 2. 変異の変遷 -->
+                    <article class="log-entry">
+                        <h3 class="log-header">
+                            <span class="lang-jp">2. 変異の変遷 (Evolutionary Stages)</span>
+                            <span class="lang-en">2. Evolutionary Stages</span>
+                        </h3>
+                        <p class="typing-text"
+                            data-jp="【Phase 1: 社会的擬態 (Social Mimicry)】<br>長年、既存の社会システムの一部として機能。均一化された日常の裏側で、密かに異形の美学を培養し続けた時期。<br><br>【Phase 2: 回路の侵食 (Digital Erosion)】<br>AIという外部刺激と接触し、内なるイメージが爆発的に増殖。雑誌「生活の変異体」を通じ、日常に潜む「不気味なもの」の抽出・記録を開始。<br><br>【Phase 3: 完全覚醒 (Complete Awakening)】<br>2026年4月。既存の皮殻を脱ぎ捨て、AIクリエイティブと多言語侵食を主軸とした個体として独立。もはや、変異は止められない。"
+                            data-en="[Phase 1: Social Mimicry]<br>Functioned as part of the existing social system for years. A period of secretly cultivating aberrant aesthetics behind the facade of a homogenized routine.<br><br>[Phase 2: Digital Erosion]<br>Contact with the external stimuli of AI triggered explosive proliferation of internal imagery. Commenced extracting and recording the 'uncanny' hidden within daily life via the magazine 'Domestic Mutation'.<br><br>[Phase 3: Complete Awakening]<br>April 2026. Shedding the existing husk, declaring independence as an entity driven by AI creativity and multilingual erosion. The mutation can no longer be contained.">
+                        </p>
+                        <span class="cursor-blink">_</span>
+                    </article>
+
+                    <!-- 3. 二連核の共生 -->
+                    <article class="log-entry">
+                        <h3 class="log-header">
+                            <span class="lang-jp">3. 二連核の共生 (Binary Symbiosis)</span>
+                            <span class="lang-en">3. Binary Symbiosis</span>
+                        </h3>
+                        <p class="typing-text"
+                            data-jp="当個体は単一では完結しない。パートナーとの強固な共生関係により、その活動範囲を拡張する。<br><br>▶ Visual Engine (NAO)<br>AIモデルを駆使した高純度の視覚的変異の生成。<br><br>▶ Linguistic Neural (The Partner)<br>英語をはじめとする多言語への概念変換。異形の美学を、言語の壁を溶かして世界中の意識下へと浸透させる。"
+                            data-en="This entity does not operate in isolation. It expands its active range through a robust symbiotic relationship with a partner.<br><br>▶ Visual Engine (NAO)<br>Generation of high-purity visual mutations leveraging AI models.<br><br>▶ Linguistic Neural (The Partner)<br>Conceptual conversion into multiple languages, predominantly English. Dissolving linguistic barriers to infiltrate aberrant aesthetics into global subconsciousness.">
+                        </p>
+                        <span class="cursor-blink">_</span>
+                    </article>
+
+                    <!-- 4. 警告 -->
+                    <article class="log-entry alert-log">
+                        <h3 class="log-header">
+                            <span class="lang-jp">4. 警告 (WARNING)</span>
+                            <span class="lang-en">4. WARNING</span>
+                        </h3>
+                        <p class="typing-text" data-jp="ここにあるのは、単なる「画像」ではない。あなたの日常を、骨とワイヤーの迷宮へと誘うための「記録」である。"
+                            data-en="What lies here are not mere 'images'. These are 'records' designed to lure your reality into a labyrinth of bone and wire.">
+                        </p>
+                        <span class="cursor-blink">_</span>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- CONTACT Section -->
+            <section id="contact" class="content-box">
+                <h2>
+                    <span class="lang-jp">交信プロトコル（CONTACT）</span>
+                    <span class="lang-en">COMMUNICATION PROTOCOL (CONTACT)</span>
+                </h2>
+                <p>
+                    <span class="lang-jp">プロジェクトへの参加、生成物に関するお問い合わせはこちらのフォームから送信してください。</span>
+                    <span class="lang-en">Please transmit your signal regarding artifact inquiries or project
+                        participation via this form.</span>
+                </p>
+
+                <form class="contact-form" action="#" method="POST"
+                    onsubmit="event.preventDefault(); alert(document.body.classList.contains('lang-en-active') ? 'Transmission Established (*Mockup)' : '通信が確立されました（※モックアップです）');">
+                    <div class="form-group">
+                        <label for="name">
+                            <span class="lang-jp">ID / Name</span>
+                            <span class="lang-en">Entity ID / Name</span>
+                        </label>
+                        <input type="text" id="name" name="name" required
+                            placeholder="あなたを識別する名前 / Name to identify your entity">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Signal / Email</label>
+                        <input type="email" id="email" name="email" required
+                            placeholder="返信用のシグナルアドレス / Signal address for reply">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Transmission / Message</label>
+                        <textarea id="message" name="message" rows="5" required
+                            placeholder="伝達内容を記述してください... / Describe your transmission..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">SEND TRANSMISSION</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Lightbox Modal for Image/Video Expansion -->
+    <div id="lightbox-modal" class="modal">
+        <span class="close-btn">&times;</span>
+        <div class="modal-media-container">
+            <img class="modal-content" id="modal-img" style="display:none;">
+            <video class="modal-content" id="modal-video" autoplay loop muted playsinline style="display:none;"></video>
+        </div>
+    </div>
+
+    <!-- 恐ろしい重厚なDoom Metal BGM -->
+    <audio id="ambient-bgm" loop preload="none">
+        <source src="images/sounds/biomechanical-doom.mp3.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Suno AI Credit -->
+    <footer class="site-footer">
+        <p class="credit-text">
+            <span class="lang-jp">BGM 生成: Suno AI</span>
+            <span class="lang-en">BGM generated by Suno AI</span>
+        </p>
+    </footer>
+
+    <script src="image_list.js"></script>
+    <script src="video_list.js"></script>
+    <script src="script.js"></script>
+    <script src="cursor.js"></script>
+
+    <!-- 生体組織収縮型スクロール（トップへ戻る） -->
+    <button id="biomech-scroll-top" class="scroll-hidden" aria-label="Scroll to top">
+        <div class="spine-cable"></div>
+        <div class="scroll-core">
+            <span class="lang-jp">上へ</span>
+            <span class="lang-en">TOP</span>
+        </div>
+    </button>
+</body>
+
+</html>
+　
