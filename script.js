@@ -222,12 +222,6 @@ const rssUrl = 'https://note.com/swimukichi/rss';
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 5);
-            const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 5);
-
-        container.innerHTML = ''; // ローディング表示をクリア
-
-        // ギャラリーに追加する画像を古い順にprependしていくことで、結果的に最新記事の画像が一番上に来るようにする
-        const itemsForGallery = [...items].reverse();
         itemsForGallery.forEach(item => {
             const contentHtml = extractContent(item);
             const thumbnailUrl = extractThumbnail(item, contentHtml);
