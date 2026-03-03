@@ -207,20 +207,22 @@ if (bgmToggle && ambientBgm) {
 // noteのRSSフィードを読み込んで表示する機能
 const rssFeedUrl = "https://note.com/swi0801/m/md9fde77c22b2/rss";
 // CORS回避とXMLの直接取得のために allorigins API を経由
-const apiUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssFeedUrl)}`;
+const rssUrl = 'https://note.com/swimukichi/rss';
+    const apiUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
 
-async function fetchNoteRSS() {
-    const container = document.getElementById("rss-feed-container");
-    if (!container) return;
+    async function fetchNoteRSS() {
+        const container = document.getElementById("rss-feed-container");
+        if (!container) return;
 
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Network response was not ok");
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Network response was not ok");
 
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-        const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 3);
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 5);
+            const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 5);
 
         container.innerHTML = ''; // ローディング表示をクリア
 
