@@ -85,10 +85,10 @@ const mediaObserver = new IntersectionObserver((entries, observer) => {
 if (galleryContainer) {
     const allMedia = [];
     if (typeof videoFiles !== 'undefined') {
-        videoFiles.forEach(f => allMedia.push({ type: 'video', src: `images/${f}` }));
+        videoFiles.forEach(f => allMedia.push({ type: 'video', src: `${f}` }));
     }
     if (typeof imageFiles !== 'undefined') {
-        imageFiles.forEach(f => allMedia.push({ type: 'image', src: `images/${f}` }));
+        imageFiles.forEach(f => allMedia.push({ type: 'image', src: `${f}` }));
     }
 
     allMedia.forEach(media => {
