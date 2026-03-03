@@ -222,8 +222,6 @@ const rssUrl = 'https://note.com/swimukichi/rss';
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             const items = Array.from(xmlDoc.querySelectorAll("item")).slice(0, 5);
-                const galleryItem = document.createElement("div");
-                galleryItem.className = "gallery-item";
 
                 const img = document.createElement("img");
                 img.dataset.src = thumbnailUrl;
