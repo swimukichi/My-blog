@@ -22,7 +22,8 @@ if (galleryContainer) {
         const item = document.createElement('div');
         item.className = 'gallery-item';
         const el = document.createElement(media.type === 'video' ? 'video' : 'img');
-        el.src = media.src;
+el.src = media.src;
+el.setAttribute('loading', 'lazy'); // 
         if (media.type === 'video') { el.muted = true; el.loop = true; el.playsInline = true; }
         item.appendChild(el);
         galleryContainer.appendChild(item);
@@ -52,7 +53,7 @@ async function fetchNoteRSS() {
             const imageUrl = imgMatch ? imgMatch[1] : 'images/default-note.jpg';
             container.insertAdjacentHTML('beforeend', `
                 <a href="${link}" target="_blank" class="note-card">
-                    <img src="${imageUrl}" alt="${title}">
+                   <img src="${imageUrl}" alt="${title}" loading="lazy">
                     <div class="note-content"><h3>${title}</h3></div>
                 </a>
             `);
